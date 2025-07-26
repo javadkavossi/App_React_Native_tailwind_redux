@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getTheme } from '../constants/theme';
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { isDarkMode } = useSelector(state => state.theme);
   const theme = getTheme(isDarkMode);
+  const insets = useSafeAreaInsets();
 
   // Mock search results with Finglish names and real images
   const searchResults = [
@@ -72,7 +74,10 @@ const SearchScreen = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, {
+      backgroundColor: theme.colors.background,
+      paddingTop: Math.max(insets.top, 8)
+    }]}>
       <View style={[styles.searchHeader, {
         backgroundColor: theme.colors.card,
         borderBottomColor: theme.colors.border
@@ -105,12 +110,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchHeader: {
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
   },
   searchInput: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 8,
     fontSize: 16,
   },
@@ -124,9 +129,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   resultAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginRight: 12,
   },
   resultInfo: {
@@ -134,19 +139,19 @@ const styles = StyleSheet.create({
   },
   resultUsername: {
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 15,
   },
   resultName: {
-    fontSize: 14,
+    fontSize: 13,
   },
   followButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 6,
   },
   followButtonText: {
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
   },
 });
 

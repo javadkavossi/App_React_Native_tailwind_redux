@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { getTheme } from '../constants/theme';
+import { toggleTheme } from '../store/slices/themeSlice';
+import Toast from '../components/Toast';
 
 const ProfileScreen = () => {
   const { currentUser } = useSelector(state => state.user);
+  const { isDarkMode } = useSelector(state => state.theme);
+  const dispatch = useDispatch();
+  const theme = getTheme(isDarkMode);
+  const insets = useSafeAreaInsets();
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
 
   const formatNumber = (num) => {
     if (num >= 1000000) {
@@ -14,89 +24,127 @@ const ProfileScreen = () => {
     return num.toString();
   };
 
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast({ visible: false, message: '', type: 'success' });
+  };
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+    showToast(`Switched to ${isDarkMode ? 'Light' : 'Dark'} Mode`, 'success');
+  };
+
+  const handleSettingsPress = () => {
+    router.push('/settings');
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>{currentUser.username}</Text>
-          <TouchableOpacity>
-            <Text style={styles.settingsIcon}>⚙️</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
 
-      {/* Profile Info */}
-      <View style={styles.profileSection}>
-        <View style={styles.profileHeader}>
-          <Image
-            source={{ uri: currentUser.avatar }}
-            style={styles.profileAvatar}
-          />
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{currentUser.name}</Text>
-            <Text style={styles.profileUsername}>{currentUser.username}</Text>
-          </View>
-        </View>
-
-        {/* Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{formatNumber(currentUser.posts)}</Text>
-            <Text style={styles.statLabel}>پست</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{formatNumber(currentUser.followers)}</Text>
-            <Text style={styles.statLabel}>دنبال‌کننده</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{formatNumber(currentUser.following)}</Text>
-            <Text style={styles.statLabel}>دنبال‌شونده</Text>
-          </View>
-        </View>
-
-        {/* Edit Profile Button */}
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editButtonText}>ویرایش پروفایل</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Posts Grid */}
-      <View style={styles.postsSection}>
-        <View style={styles.postsHeader}>
-          <TouchableOpacity style={styles.postsTab}>
-            <Text style={styles.postsTabText}>📷</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.postsTab}>
-            <Text style={styles.postsTabTextInactive}>📌</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Mock Posts Grid */}
-        <View style={styles.postsGrid}>
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <View key={item} style={styles.postItem}>
-              <View style={styles.postPlaceholder}>
-                <Text style={styles.postPlaceholderIcon}>📷</Text>
-              </View>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={[styles.header, {
+          backgroundColor: theme.colors.card,
+          borderBottomColor: theme.colors.border,
+          paddingTop: Math.max(insets.top, 8)
+        }]}>
+          <View style={styles.headerContent}>
+            <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>{currentUser.username}</Text>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity onPress={handleToggleTheme} style={styles.themeButton}>
+                <Text style={styles.themeIcon}>{isDarkMode ? '☀️' : '🌙'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSettingsPress}>
+                <Text style={styles.settingsIcon}>⚙️</Text>
+              </TouchableOpacity>
             </View>
-          ))}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+
+        {/* Profile Info */}
+        <View style={[styles.profileSection, {
+          backgroundColor: theme.colors.card,
+          borderBottomColor: theme.colors.border
+        }]}>
+          <View style={styles.profileHeader}>
+            <Image
+              source={{ uri: currentUser.avatar }}
+              style={styles.profileAvatar}
+            />
+            <View style={styles.profileInfo}>
+              <Text style={[styles.profileName, { color: theme.colors.text.primary }]}>{currentUser.name}</Text>
+              <Text style={[styles.profileUsername, { color: theme.colors.text.secondary }]}>{currentUser.username}</Text>
+            </View>
+          </View>
+
+          {/* Stats */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={[styles.statNumber, { color: theme.colors.text.primary }]}>{formatNumber(currentUser.posts)}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>Posts</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statNumber, { color: theme.colors.text.primary }]}>{formatNumber(currentUser.followers)}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>Followers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statNumber, { color: theme.colors.text.primary }]}>{formatNumber(currentUser.following)}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>Following</Text>
+            </View>
+          </View>
+
+          {/* Edit Profile Button */}
+          <TouchableOpacity style={[styles.editButton, { backgroundColor: theme.colors.input }]}>
+            <Text style={[styles.editButtonText, { color: theme.colors.text.primary }]}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Posts Grid */}
+        <View style={[styles.postsSection, { backgroundColor: theme.colors.card }]}>
+          <View style={[styles.postsHeader, { borderBottomColor: theme.colors.border }]}>
+            <TouchableOpacity style={[styles.postsTab, { borderBottomColor: theme.colors.primary }]}>
+              <Text style={[styles.postsTabText, { color: theme.colors.primary }]}>📷</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.postsTab}>
+              <Text style={[styles.postsTabTextInactive, { color: theme.colors.text.secondary }]}>📌</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Mock Posts Grid */}
+          <View style={styles.postsGrid}>
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <View key={item} style={[styles.postItem, { borderColor: theme.colors.border }]}>
+                <View style={[styles.postPlaceholder, { backgroundColor: theme.colors.input }]}>
+                  <Text style={[styles.postPlaceholderIcon, { color: theme.colors.text.secondary }]}>📷</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
   },
   headerContent: {
     flexDirection: 'row',
@@ -104,93 +152,92 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#262626',
   },
-  settingsIcon: {
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  themeButton: {
+    marginRight: 12,
+    padding: 4,
+  },
+  themeIcon: {
     fontSize: 18,
   },
+  settingsIcon: {
+    fontSize: 16,
+  },
   profileSection: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   profileAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 12,
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#262626',
   },
   profileUsername: {
-    color: '#8E8E93',
-    fontSize: 16,
+    fontSize: 14,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   statItem: {
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#262626',
   },
   statLabel: {
-    color: '#8E8E93',
-    fontSize: 14,
+    fontSize: 12,
   },
   editButton: {
-    backgroundColor: '#F0F0F0',
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingVertical: 6,
+    borderRadius: 6,
   },
   editButtonText: {
     textAlign: 'center',
     fontWeight: '600',
-    color: '#262626',
+    fontSize: 14,
   },
   postsSection: {
-    backgroundColor: '#FFFFFF',
+    flex: 1,
   },
   postsHeader: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
   },
   postsTab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 2,
-    borderBottomColor: '#0095F6',
   },
   postsTabText: {
     textAlign: 'center',
-    color: '#0095F6',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 14,
   },
   postsTabTextInactive: {
     textAlign: 'center',
-    color: '#8E8E93',
-    fontSize: 16,
+    fontSize: 14,
   },
   postsGrid: {
     flexDirection: 'row',
@@ -200,18 +247,15 @@ const styles = StyleSheet.create({
     width: '33.33%',
     aspectRatio: 1,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
   },
   postPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F0F0F0',
     alignItems: 'center',
     justifyContent: 'center',
   },
   postPlaceholderIcon: {
-    color: '#8E8E93',
-    fontSize: 24,
+    fontSize: 20,
   },
 });
 

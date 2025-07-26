@@ -1,57 +1,64 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getTheme } from '../constants/theme';
 
 const NotificationsScreen = () => {
+  const { isDarkMode } = useSelector(state => state.theme);
+  const theme = getTheme(isDarkMode);
+  const insets = useSafeAreaInsets();
+
   const notifications = [
     {
       id: '1',
       type: 'like',
       user: {
-        username: 'علی_احمدی',
+        username: 'ali_ahmadi',
         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
       },
-      message: 'پست شما را پسندید',
-      time: '۲ ساعت پیش'
+      message: 'liked your post',
+      time: '2h ago'
     },
     {
       id: '2',
       type: 'follow',
       user: {
-        username: 'فاطمه_محمدی',
+        username: 'fateme_mohammadi',
         avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
       },
-      message: 'شما را دنبال کرد',
-      time: '۵ ساعت پیش'
+      message: 'started following you',
+      time: '5h ago'
     },
     {
       id: '3',
       type: 'comment',
       user: {
-        username: 'محمد_رضایی',
+        username: 'mohammad_rezaei',
         avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
       },
-      message: 'نظر داد: "عکس زیبایی!"',
-      time: '۱ روز پیش'
+      message: 'commented: "Great photo!"',
+      time: '1d ago'
     },
     {
       id: '4',
       type: 'like',
       user: {
-        username: 'زهرا_حسینی',
+        username: 'zahra_hosseini',
         avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
       },
-      message: 'پست شما را پسندید',
-      time: '۲ روز پیش'
+      message: 'liked your post',
+      time: '2d ago'
     },
     {
       id: '5',
       type: 'follow',
       user: {
-        username: 'امیر_کریمی',
+        username: 'amir_karimi',
         avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
       },
-      message: 'شما را دنبال کرد',
-      time: '۳ روز پیش'
+      message: 'started following you',
+      time: '3d ago'
     }
   ];
 
@@ -65,22 +72,31 @@ const NotificationsScreen = () => {
   };
 
   const renderNotification = ({ item }) => (
-    <TouchableOpacity style={styles.notificationItem}>
+    <TouchableOpacity style={[styles.notificationItem, {
+      backgroundColor: theme.colors.card,
+      borderBottomColor: theme.colors.border
+    }]}>
       <Image source={{ uri: item.user.avatar }} style={styles.notificationAvatar} />
       <View style={styles.notificationContent}>
-        <Text style={styles.notificationText}>
-          <Text style={styles.notificationUsername}>{item.user.username}</Text> {item.message}
+        <Text style={[styles.notificationText, { color: theme.colors.text.primary }]}>
+          <Text style={[styles.notificationUsername, { fontWeight: '600' }]}>{item.user.username}</Text> {item.message}
         </Text>
-        <Text style={styles.notificationTime}>{item.time}</Text>
+        <Text style={[styles.notificationTime, { color: theme.colors.text.secondary }]}>{item.time}</Text>
       </View>
       <Text style={styles.notificationIcon}>{getNotificationIcon(item.type)}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>اعلان‌ها</Text>
+    <View style={[styles.container, {
+      backgroundColor: theme.colors.background,
+      paddingTop: Math.max(insets.top, 8)
+    }]}>
+      <View style={[styles.header, {
+        backgroundColor: theme.colors.card,
+        borderBottomColor: theme.colors.border
+      }]}>
+        <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>Notifications</Text>
       </View>
 
       <FlatList
@@ -97,19 +113,14 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#262626',
-    textAlign: 'right',
   },
   listContainer: {
     flexGrow: 1,
@@ -117,37 +128,31 @@ const styles = StyleSheet.create({
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#FFFFFF',
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
   },
   notificationAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 10,
   },
   notificationContent: {
     flex: 1,
   },
   notificationText: {
-    color: '#262626',
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'right',
+    fontSize: 13,
+    lineHeight: 18,
   },
   notificationUsername: {
     fontWeight: '600',
   },
   notificationTime: {
-    color: '#8E8E93',
-    fontSize: 12,
-    marginTop: 4,
-    textAlign: 'right',
+    fontSize: 11,
+    marginTop: 2,
   },
   notificationIcon: {
-    fontSize: 18,
+    fontSize: 16,
   },
 });
 

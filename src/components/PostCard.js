@@ -110,49 +110,51 @@ const PostCard = ({ post }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 12,
     borderBottomWidth: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 10,
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    marginRight: 10,
   },
   headerInfo: {
     flex: 1,
   },
   username: {
     fontWeight: '600',
+    fontSize: 14,
   },
   timestamp: {
-    fontSize: 12,
+    fontSize: 11,
   },
   moreButton: {
     fontWeight: 'bold',
+    fontSize: 14,
   },
   postImage: {
     width: '100%',
-    height: 384,
+    height: 320,
   },
   actionsContainer: {
-    padding: 12,
+    padding: 10,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   actionButton: {
-    marginRight: 16,
+    marginRight: 14,
   },
   actionIcon: {
-    fontSize: 24,
+    fontSize: 20,
   },
   likedIcon: {
     color: '#ED4956',
@@ -163,6 +165,7 @@ const styles = StyleSheet.create({
   likesText: {
     fontWeight: '600',
     marginBottom: 4,
+    fontSize: 14,
   },
   captionContainer: {
     flexDirection: 'row',
@@ -170,13 +173,15 @@ const styles = StyleSheet.create({
   },
   captionUsername: {
     fontWeight: '600',
-    marginRight: 8,
+    marginRight: 6,
+    fontSize: 14,
   },
   captionText: {
     flex: 1,
+    fontSize: 14,
   },
   commentsText: {
-    fontSize: 14,
+    fontSize: 13,
   },
 });
 

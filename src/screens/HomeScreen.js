@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fetchPosts } from '../store/slices/postsSlice';
 import { getTheme } from '../constants/theme';
 import PostCard from '../components/PostCard';
@@ -10,6 +11,7 @@ const HomeScreen = () => {
   const { posts, loading, error } = useSelector(state => state.posts);
   const { isDarkMode } = useSelector(state => state.theme);
   const theme = getTheme(isDarkMode);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     dispatch(fetchPosts());
@@ -23,7 +25,10 @@ const HomeScreen = () => {
 
   if (loading && posts.length === 0) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.loadingContainer, {
+        backgroundColor: theme.colors.background,
+        paddingTop: Math.max(insets.top, 16)
+      }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={[styles.loadingText, { color: theme.colors.text.secondary }]}>Loading posts...</Text>
       </View>
@@ -32,7 +37,10 @@ const HomeScreen = () => {
 
   if (error) {
     return (
-      <View style={[styles.errorContainer, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.errorContainer, {
+        backgroundColor: theme.colors.background,
+        paddingTop: Math.max(insets.top, 16)
+      }]}>
         <Text style={[styles.errorText, { color: theme.colors.error }]}>Error: {error}</Text>
         <TouchableOpacity
           onPress={onRefresh}
@@ -45,7 +53,10 @@ const HomeScreen = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, {
+      backgroundColor: theme.colors.background,
+      paddingTop: Math.max(insets.top, 8)
+    }]}>
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}

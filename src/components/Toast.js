@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, TouchableOpacity } from 'react-native';
+import { Animated, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+import { getTheme } from '../constants/theme';
 
-const Toast = ({ visible, message, type = 'success', onHide }) => {
+const Toast = ({ message, type = 'success', visible, onHide }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-100)).current;
+  const { isDarkMode } = useSelector(state => state.theme);
+  const theme = getTheme(isDarkMode);
 
   useEffect(() => {
     if (visible) {
@@ -48,26 +52,25 @@ const Toast = ({ visible, message, type = 'success', onHide }) => {
   const getToastStyle = () => {
     switch (type) {
       case 'success':
-        return 'bg-success';
+        return {
+          backgroundColor: theme.colors.success,
+          borderColor: theme.colors.success,
+        };
       case 'error':
-        return 'bg-error';
+        return {
+          backgroundColor: theme.colors.error,
+          borderColor: theme.colors.error,
+        };
       case 'warning':
-        return 'bg-warning';
+        return {
+          backgroundColor: theme.colors.warning,
+          borderColor: theme.colors.warning,
+        };
       default:
-        return 'bg-primary';
-    }
-  };
-
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return '✅';
-      case 'error':
-        return '❌';
-      case 'warning':
-        return '⚠️';
-      default:
-        return 'ℹ️';
+        return {
+          backgroundColor: theme.colors.primary,
+          borderColor: theme.colors.primary,
+        };
     }
   };
 
@@ -75,21 +78,44 @@ const Toast = ({ visible, message, type = 'success', onHide }) => {
 
   return (
     <Animated.View
-      style={{
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-      }}
-      className={`absolute top-16 left-4 right-4 z-50 ${getToastStyle()} rounded-lg p-4 shadow-lg`}
+      style={[
+        styles.toast,
+        getToastStyle(),
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <View className="flex-row items-center">
-        <Text className="text-lg mr-2">{getIcon()}</Text>
-        <Text className="flex-1 text-white font-medium">{message}</Text>
-        <TouchableOpacity onPress={hideToast}>
-          <Text className="text-white text-lg">✕</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.toastText}>{message}</Text>
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  toast: {
+    position: 'absolute',
+    top: 60,
+    left: 16,
+    right: 16,
+    padding: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});
 
 export default Toast; 
